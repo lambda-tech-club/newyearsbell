@@ -5,6 +5,7 @@ type bellRefT = {
   bellSound: HTMLAudioElement;
   kotoSound: HTMLAudioElement;
   isRinging: boolean;
+  isPerfectHuman: boolean;
   lustCnt: number;
 };
 
@@ -52,13 +53,23 @@ function App() {
     bellRef.current.bellSound.play();
   };
 
+  // 琴の音の初期化
+  const initKotoSound = () => {
+    bellRef.current.kotoSound.volume = 0;
+    bellRef.current.kotoSound.play();
+    bellRef.current.kotoSound.pause();
+    bellRef.current.kotoSound.currentTime = 0;
+    bellRef.current.kotoSound.volume = 1;
+  };
+
   // 煩悩消す作業の状態管理
   const eliminateLust = () => {
-    if (isPerfectHuman) return;
+    if (bellRef.current.isPerfectHuman || isPerfectHuman) return;
 
     if (lustCnt + 1 >= lustLimit || bellRef.current.lustCnt + 1 >= lustLimit) {
       setIsPerfectHuman(true);
       bellRef.current.kotoSound.play();
+      bellRef.current.isPerfectHuman = true;
     }
 
     bellRef.current.lustCnt++;
@@ -70,6 +81,7 @@ function App() {
     // iOSなどのデバイスで音を出すため、ユーザーに画面を最低一度タップしてもらう必要があり、
     // 始めるボタンを最初に鐘を叩いたと見なす
     gong();
+    initKotoSound();
   };
 
   // 加速度が一定を超えたら
@@ -108,7 +120,6 @@ function App() {
   useEffect(() => {
     // 初期化のとき一度だけrefの値を設定する。
     initBellRef();
-
     if (window.DeviceOrientationEvent) {
       if (
         DeviceOrientationEvent.requestPermission &&
