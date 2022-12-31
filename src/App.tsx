@@ -8,7 +8,7 @@ function App() {
   const [hasPermission, setPermission] = useState(false);
   const effectTime = 1000; // ms
   const threshold = 10; // よくわからん単位
-  const lusts = 3; // 煩悩の数
+  const lusts = 108; // 煩悩の数
   const bellRef = useRef();
   const kotoRef = useRef();
   const isRingingRef = useRef();
