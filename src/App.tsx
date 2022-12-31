@@ -8,8 +8,9 @@ function App() {
   const [hasPermission, setPermission] = useState(false);
   const effectTime = 1000; // ms
   const threshold = 10; // よくわからん単位
-  const lusts = 108; // 煩悩の数
+  const lusts = 3; // 煩悩の数
   const bellRef = useRef();
+  const kotoRef = useRef();
   const isRingingRef = useRef();
 
   const ring = () => {
@@ -40,6 +41,7 @@ function App() {
 
   const handleStart = () => {
     setIsModalOpen(false);
+    ring();
   };
 
   // 加速度が一定を超えたら
@@ -61,8 +63,7 @@ function App() {
         if (response === "granted") {
           setPermission(true);
           window.addEventListener("devicemotion", handleDevicemotion);
-          setIsModalOpen(false);
-          ring();
+          // setIsModalOpen(false);
         }
       })
       .catch(e => {
@@ -74,6 +75,7 @@ function App() {
     // 初期化のとき一度だけrefの値を設定する。
     isRingingRef.currnet = false;
     bellRef.current = new Audio("/bell.mp3");
+    kotoRef.current = new Audio("/koto.mp3");
 
     if (window.DeviceOrientationEvent) {
       if (
@@ -88,9 +90,15 @@ function App() {
     }
   }, []);
 
+  if (count === lusts) {
+    kotoRef.current.play();
+  }
+
   return (
     <div className="App">
-      <div class="center">{isRinging ? "ゴ〜ン" : count >= lusts ? "迎春" : ""}</div>
+      <div class="center">
+        {isRinging ? "ゴ〜ン" : count >= lusts ? "迎春" : ""}
+      </div>
       <div className={isModalOpen ? "bg" : ""}>
         {count >= lusts && (
           <img className="complete" src="/background.webp" alt="迎春" />
@@ -108,13 +116,21 @@ function App() {
         <div className="card">
           <div className="counter">{`${count}回`}</div>
         </div>
-        <p className="read-the-docs">端末を振ると鐘が鳴ります</p>
+        <p className="read-the-docs">
+          端末を振ると鐘が鳴ります
+        </p>
       </div>
       <div className={isModalOpen ? "modal" : "modal-close"}>
-        <p>端末を振って鐘を鳴らそう</p>
-        <button onClick={hasPermission ? handleStart : handlePermissionRequest}>
-          始める
-        </button>
+        <p className="modal-text">端末を振って鐘を鳴らそう</p>
+        {!hasPermission ? (
+          <button
+            onClick={hasPermission ? handleStart : handlePermissionRequest}
+          >
+            センサーを起動
+          </button>
+        ) : (
+          <button onClick={handleStart}>始める</button>
+        )}
       </div>
     </div>
   );

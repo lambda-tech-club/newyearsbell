@@ -64,6 +64,11 @@
   display: none;
 }
 
+.modal-text {
+  font-size: 1.3em;
+  line-height: 1.5em;
+}
+
 .modal {
   color: #242424;
   border-radius: 8px;
@@ -75,15 +80,6 @@
   max-width: 500px;
   padding: 10px 30px;
   background-color: #fff;
-}
-
-/* 以下ボタンスタイル */
-button {
-  padding: 10px;
-  background-color: #fff;
-  border: 1px solid #282828;
-  border-radius: 2px;
-  cursor: pointer;
 }
 
 .counter {
