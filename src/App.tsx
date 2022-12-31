@@ -55,7 +55,7 @@ function App() {
   const eliminateLust = () => {
     if (isPerfectHuman) return;
 
-    if (lustCnt + 1 === lustLimit) {
+    if (lustCnt + 1 >= lustLimit) {
       setIsPerfectHuman(true);
       bellRef.current.kotoSound.play();
     }
