@@ -5,6 +5,7 @@ type bellRefT = {
   bellSound: HTMLAudioElement;
   kotoSound: HTMLAudioElement;
   isRinging: boolean;
+  lustCnt: number;
 };
 
 function App() {
@@ -55,11 +56,12 @@ function App() {
   const eliminateLust = () => {
     if (isPerfectHuman) return;
 
-    if (lustCnt + 1 >= lustLimit) {
+    if (lustCnt + 1 >= lustLimit || bellRef.current.lustCnt + 1 >= lustLimit) {
       setIsPerfectHuman(true);
       bellRef.current.kotoSound.play();
     }
 
+    bellRef.current.lustCnt++;
     setLustCnt(lustCnt => lustCnt + 1);
   };
 
@@ -98,7 +100,8 @@ function App() {
     bellRef.current = {
       isRinging: false,
       bellSound: new Audio("/bell.mp3"),
-      kotoSound: new Audio("/koto.mp3")
+      kotoSound: new Audio("/koto.mp3"),
+      lustCnt: 0
     };
   };
 
