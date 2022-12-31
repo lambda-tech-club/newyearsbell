@@ -7,8 +7,11 @@ function App() {
   const [hasPermission, setPermission] = useState(false);
   const bell = new Audio("/bell.wav");
   const effectTime = 3000;
+  const threshold = 5;
 
+  // 鐘を鳴らす処理
   const ring = () => {
+    if (isRinging) return;
     setRinging(true);
     setCount(count => count + 1);
     bell.pause();
@@ -19,13 +22,20 @@ function App() {
     }, effectTime);
   };
 
+  // 加速度が一定を超えたら
+  const handleDevicemotion = (e) => {
+    if (e.acceleration.x > threshold) {
+      ring();
+    }
+  };
+
+  // 加速度センサーの使用許可を取得
   const handlePermissionRequest = () => {
-    // 加速度センサーの使用許可
     DeviceOrientationEvent.requestPermission()
       .then(function(response) {
         if (response === "granted") {
-          window.addEventListener("devicemotion", devicemotionHandler);
           setPermission(true);
+          window.addEventListener("devicemotion", handleDevicemotion);
         }
       })
       .catch(e => {
@@ -41,11 +51,7 @@ function App() {
       ) {
       } else {
         setPermission(true);
-        window.addEventListener("devicemotion", e => {
-          if (e.acceleration.x > 5) {
-            ring();
-          }
-        });
+        window.addEventListener("devicemotion", handleDevicemotion);
       }
     }
   }, []);
