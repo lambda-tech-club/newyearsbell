@@ -4,9 +4,11 @@ import "./App.css";
 function App() {
   const [count, setCount] = useState(0);
   const [isRinging, setIsRinging] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(true);
   const [hasPermission, setPermission] = useState(false);
   const effectTime = 1000; // ms
-  const threshold = 10;
+  const threshold = 10; // よくわからん単位
+  const lusts = 108; // 煩悩の数
   const bellRef = useRef();
   const isRingingRef = useRef();
 
@@ -36,6 +38,10 @@ function App() {
     }, effectTime);
   };
 
+  const handleStart = () => {
+    setIsModalOpen(false);
+  };
+
   // 加速度が一定を超えたら
   const handleDevicemotion = e => {
     if (isRingingRef.currnet) return;
@@ -55,6 +61,8 @@ function App() {
         if (response === "granted") {
           setPermission(true);
           window.addEventListener("devicemotion", handleDevicemotion);
+          setIsModalOpen(false);
+          ring();
         }
       })
       .catch(e => {
@@ -72,6 +80,7 @@ function App() {
         DeviceOrientationEvent.requestPermission &&
         typeof DeviceOrientationEvent.requestPermission === "function"
       ) {
+        setPermission(false);
       } else {
         setPermission(true);
         window.addEventListener("devicemotion", handleDevicemotion);
@@ -81,23 +90,32 @@ function App() {
 
   return (
     <div className="App">
-      <div>
-        <a onClick={isRinging ? null : ring}>
-          <img
-            src="/bell.png"
-            className={isRinging ? "bell ring" : "bell"}
-            alt="除夜の鐘"
-          />
-        </a>
-      </div>
-
-      <div className="card">
-        <div className="counter">{`${count}回`}</div>
-        {!hasPermission && (
-          <button onClick={handlePermissionRequest}>Permission Request</button>
+      <div class="center">{isRinging ? "ゴ〜ン" : count >= lusts ? "迎春" : ""}</div>
+      <div className={isModalOpen ? "bg" : ""}>
+        {count >= lusts && (
+          <img className="complete" src="/background.webp" alt="迎春" />
         )}
+        <div>
+          <a onClick={isRinging ? null : ring}>
+            <img
+              src="/bell.webp"
+              className={isRinging ? "bell ring" : "bell"}
+              alt="除夜の鐘"
+            />
+          </a>
+        </div>
+
+        <div className="card">
+          <div className="counter">{`${count}回`}</div>
+        </div>
+        <p className="read-the-docs">端末を振ると鐘が鳴ります</p>
       </div>
-      <p className="read-the-docs">端末を振ると鐘が鳴ります</p>
+      <div className={isModalOpen ? "modal" : "modal-close"}>
+        <p>端末を振って鐘を鳴らそう</p>
+        <button onClick={hasPermission ? handleStart : handlePermissionRequest}>
+          始める
+        </button>
+      </div>
     </div>
   );
 }
