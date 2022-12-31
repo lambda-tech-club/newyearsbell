@@ -5,16 +5,12 @@
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
+.bell {
+  width: 100%;
   will-change: filter;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.ring {
+  filter: drop-shadow(0 0 6em #ffde3daa);
 }
 
 @keyframes logo-spin {
@@ -34,6 +30,17 @@
 
 .card {
   padding: 2em;
+}
+
+.counter {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 2em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  transition: border-color 0.25s;
 }
 
 .read-the-docs {
