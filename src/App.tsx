@@ -1,32 +1,51 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./App.css";
 
 function App() {
   const [count, setCount] = useState(0);
-  const [isRinging, setRinging] = useState(false);
+  const [isRinging, setIsRinging] = useState(false);
   const [hasPermission, setPermission] = useState(false);
-  const bell = new Audio("/bell.wav");
-  const effectTime = 3000;
-  const threshold = 5;
+  const effectTime = 1000; // ms
+  const threshold = 10;
+  const bellRef = useRef();
+  const isRingingRef = useRef();
 
-  // 鐘を鳴らす処理
   const ring = () => {
-    if (isRinging) return;
-    setRinging(true);
+    setRingingStatuses();
+    gong();
     setCount(count => count + 1);
-    bell.pause();
-    bell.currentTime = 0;
-    bell.play();
+  };
+
+  // 鐘をゴーン
+  const gong = () => {
+    bellRef.current.pause();
+    bellRef.current.currentTime = 0;
+    bellRef.current.play();
+  };
+
+  // 鐘の状態管理
+  const setRingingStatuses = () => {
+    // EventListenerで鐘の状態を取得する必要があるため、
+    // レンダリング用のisRingingと別にUseRefでも管理する。
+    isRingingRef.currnet = true;
+    setIsRinging(true);
+
     setTimeout(() => {
-      setRinging(false);
+      isRingingRef.currnet = false;
+      setIsRinging(false);
     }, effectTime);
   };
 
   // 加速度が一定を超えたら
-  const handleDevicemotion = (e) => {
-    if (e.acceleration.x > threshold) {
+  const handleDevicemotion = e => {
+    if (isRingingRef.currnet) return;
+
+    if (
+      e.acceleration.x > threshold ||
+      e.acceleration.y > threshold ||
+      e.acceleration.z > threshold
+    )
       ring();
-    }
   };
 
   // 加速度センサーの使用許可を取得
@@ -44,6 +63,10 @@ function App() {
   };
 
   useEffect(() => {
+    // 初期化のとき一度だけrefの値を設定する。
+    isRingingRef.currnet = false;
+    bellRef.current = new Audio("/bell.mp3");
+
     if (window.DeviceOrientationEvent) {
       if (
         DeviceOrientationEvent.requestPermission &&
@@ -59,7 +82,7 @@ function App() {
   return (
     <div className="App">
       <div>
-        <a onClick={ring}>
+        <a onClick={isRinging ? null : ring}>
           <img
             src="/bell.png"
             className={isRinging ? "bell ring" : "bell"}
