@@ -9,6 +9,20 @@ type bellRefT = {
   lustCnt: number;
 };
 
+type DeviceOrientationEventType = {
+  requestPermission: () => Promise<"granted" | "denied">;
+};
+
+const isiOSDevice = (
+  deviceOrientationEvent: any
+): deviceOrientationEvent is DeviceOrientationEventType => {
+  return (
+    deviceOrientationEvent !== undefined &&
+    "requestPermission" in deviceOrientationEvent &&
+    typeof deviceOrientationEvent.requestPermission === "function"
+  );
+};
+
 function App() {
   const effectTime = 1000; // ms
   const threshold = 10; // よくわからん単位
@@ -73,7 +87,7 @@ function App() {
     }
 
     bellRef.current.lustCnt++;
-    setLustCnt(lustCnt => lustCnt + 1);
+    setLustCnt((lustCnt) => lustCnt + 1);
   };
 
   const handleStart = () => {
@@ -85,17 +99,21 @@ function App() {
   };
 
   // 加速度が一定を超えたら
-  const handleDevicemotion = e => {
+  const handleDevicemotion = (e: DeviceMotionEvent) => {
     if (
-      e.acceleration.x > threshold ||
-      e.acceleration.y > threshold ||
-      e.acceleration.z > threshold
+      (e.acceleration?.x ?? 0) > threshold ||
+      (e.acceleration?.y ?? 0) > threshold ||
+      (e.acceleration?.z ?? 0) > threshold
     )
       gong();
   };
 
   // 加速度センサーの使用許可を取得
   const handleSensorPermissionRequest = () => {
+    if (!isiOSDevice(DeviceOrientationEvent)) {
+      return;
+    }
+
     DeviceOrientationEvent.requestPermission()
       .then(function(response) {
         if (response === "granted") {
@@ -103,7 +121,7 @@ function App() {
           window.addEventListener("devicemotion", handleDevicemotion);
         }
       })
-      .catch(e => {
+      .catch((e: Error) => {
         console.log(e);
       });
   };
@@ -113,24 +131,22 @@ function App() {
       isRinging: false,
       bellSound: new Audio("/bell.mp3"),
       kotoSound: new Audio("/koto.mp3"),
-      lustCnt: 0
+      lustCnt: 0,
+      isPerfectHuman: false,
     };
   };
 
   useEffect(() => {
     // 初期化のとき一度だけrefの値を設定する。
     initBellRef();
-    if (window.DeviceOrientationEvent) {
-      if (
-        DeviceOrientationEvent.requestPermission &&
-        typeof DeviceOrientationEvent.requestPermission === "function"
-      ) {
-        setPermission(false);
-      } else {
-        setPermission(true);
-        window.addEventListener("devicemotion", handleDevicemotion);
-      }
+
+    if (isiOSDevice(window.DeviceOrientationEvent)) {
+      return;
     }
+
+    // DeviceOrientationEventが存在しない = iOS以外のデバイスの場合は、許可を取ったと見なす
+    setPermission(true);
+    window.addEventListener("devicemotion", handleDevicemotion);
   }, []);
 
   return (
@@ -160,11 +176,7 @@ function App() {
       <div className={isModalOpen ? "modal" : "modal-close"}>
         <p className="modal-text">端末を振って鐘を鳴らそう</p>
         {!hasPermission ? (
-          <button
-            onClick={
-              hasPermission ? handleStart : handleSensorPermissionRequest
-            }
-          >
+          <button onClick={handleSensorPermissionRequest}>
             センサーを起動
           </button>
         ) : (
