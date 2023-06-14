@@ -139,14 +139,14 @@ function App() {
   useEffect(() => {
     // 初期化のとき一度だけrefの値を設定する。
     initBellRef();
-    if (window.DeviceOrientationEvent) {
-      if (isiOSDevice(DeviceOrientationEvent)) {
-        setPermission(false);
-      } else {
-        setPermission(true);
-        window.addEventListener("devicemotion", handleDevicemotion);
-      }
+
+    if (isiOSDevice(window.DeviceOrientationEvent)) {
+      return;
     }
+
+    // DeviceOrientationEventが存在しない = iOS以外のデバイスの場合は、許可を取ったと見なす
+    setPermission(true);
+    window.addEventListener("devicemotion", handleDevicemotion);
   }, []);
 
   return (
@@ -176,11 +176,7 @@ function App() {
       <div className={isModalOpen ? "modal" : "modal-close"}>
         <p className="modal-text">端末を振って鐘を鳴らそう</p>
         {!hasPermission ? (
-          <button
-            onClick={
-              hasPermission ? handleStart : handleSensorPermissionRequest
-            }
-          >
+          <button onClick={handleSensorPermissionRequest}>
             センサーを起動
           </button>
         ) : (
