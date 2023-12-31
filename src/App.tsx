@@ -6,12 +6,15 @@ type bellRefT = {
   kotoSound: HTMLAudioElement;
   screamSound: HTMLAudioElement;
   doorSound: HTMLAudioElement;
+  kongSound: HTMLAudioElement;
+  bonusSound: HTMLAudioElement;
 };
 
 enum BellType {
   Normal = "/bell2.webp",
   Bad = "/badbell1.webp",
-  Door = "/badbell2.png"
+  Door = "/badbell2.webp",
+  Bonus = "/bonusbell1.webp"
 }
 
 function App() {
@@ -34,6 +37,7 @@ function App() {
   const [timerActive, setTimerActive] = useState(false);
   const [bellType, setBellType] = useState(BellType.Normal);
   const [isCriminal, setIsCriminal] = useState(false);
+  const [ringingType, setRingingType] = useState("bell ring");
 
   const bellRef = useRef<bellRefT>(null!);
 
@@ -45,15 +49,24 @@ function App() {
       case BellType.Normal:
         if (lustCnt < lustLimit - 1) {
           const randomNum = Math.random();
-          if (randomNum < 0.3) {
+          if (randomNum < 0.05) {
             setBellType(BellType.Bad);
             // 一定時間後にBellを正常に戻す
             setTimeout(() => {
               setBellType(BellType.Normal);
             }, 300);
           }
-          if (randomNum >= 0.3 && randomNum < 0.6) {
+          if (randomNum >= 0.05 && randomNum < 0.1) {
             setBellType(BellType.Door);
+            setRingingType("bell door-ring");
+            // 一定時間後にBellを正常に戻す
+            setTimeout(() => {
+              setBellType(BellType.Normal);
+              setRingingType("bell ring");
+            }, 1000);
+          }
+          if (randomNum >= 0.1 && randomNum < 0.2) {
+            setBellType(BellType.Bonus);
             // 一定時間後にBellを正常に戻す
             setTimeout(() => {
               setBellType(BellType.Normal);
@@ -62,12 +75,17 @@ function App() {
         }
         setRingingStatuses();
         playBellSound();
-        eliminateLust();
+        eliminateLust(1);
         break;
       case BellType.Door:
         setRingingStatuses();
         playDoorSound();
-        eliminateLust();
+        increaseLust();
+        break;
+      case BellType.Bonus:
+        setRingingStatuses();
+        playBonusSound();
+        eliminateLust(2);
         break;
       case BellType.Bad:
         setIsCriminal(true);
@@ -100,6 +118,13 @@ function App() {
     bellRef.current.doorSound.play();
   };
 
+  const playBonusSound = () => {
+    bellRef.current.bonusSound.pause();
+    // 連打対応のための頭出し
+    bellRef.current.bonusSound.currentTime = 1;
+    bellRef.current.bonusSound.play();
+  };
+
   // 琴の音の初期化
   const initKotoSound = () => {
     bellRef.current.kotoSound.volume = 0;
@@ -127,16 +152,32 @@ function App() {
     bellRef.current.doorSound.volume = 1;
   };
 
+  const initBonusSound = () => {
+    bellRef.current.bonusSound.volume = 0;
+    bellRef.current.bonusSound.play();
+    bellRef.current.bonusSound.pause();
+    bellRef.current.bonusSound.currentTime = 0;
+    bellRef.current.bonusSound.volume = 1;
+  };
+
   // 煩悩消す作業の状態管理
-  const eliminateLust = () => {
+  const eliminateLust = (cnt: number) => {
     if (isPerfectHuman || isCriminal) return;
 
-    if (lustCnt + 1 >= lustLimit) {
+    if (lustCnt + cnt >= lustLimit) {
       setIsPerfectHuman(true);
       bellRef.current.kotoSound.play();
     }
 
-    setLustCnt(lustCnt => lustCnt + 1);
+    setLustCnt(lustCnt => lustCnt + cnt);
+  };
+
+  const increaseLust = () => {
+    if (isPerfectHuman || isCriminal) return;
+
+    if (lustCnt > 0) {
+      setLustCnt(lustCnt => lustCnt - 1);
+    }
   };
 
   const handleStart = () => {
@@ -144,10 +185,12 @@ function App() {
     // iOSなどのデバイスで音を出すため、ユーザーに画面を最低一度タップしてもらう必要があり、
     // 始めるボタンを最初に鐘を叩いたと見なす
     setTimerActive(true);
-    gong();
+    // gong();
     initKotoSound();
     initScreamSound();
     initDoorSound();
+    initBonusSound;
+    bellRef.current.kongSound.play();
   };
 
   const initBellRef = () => {
@@ -155,7 +198,9 @@ function App() {
       bellSound: new Audio("/bell.mp3"),
       kotoSound: new Audio("/koto.mp3"),
       screamSound: new Audio("/scream.mp3"),
-      doorSound: new Audio("/chime.mp3")
+      doorSound: new Audio("/chime.mp3"),
+      kongSound: new Audio("/kong.mp3"),
+      bonusSound: new Audio("/bonus.mp3")
     };
   };
 
@@ -204,6 +249,9 @@ function App() {
         {isPerfectHuman && (
           <img className="complete" src="/background.webp" alt="迎春" />
         )}
+        {bellType === BellType.Bonus && (
+            <div className="bonus-bg"></div>
+        )}
         <div className="card">
           <div className={isPerfectHuman ? "endroll-message" : "counter"}>
             {isPerfectHuman
@@ -217,7 +265,7 @@ function App() {
           <a onClick={gong}>
             <img
               src={isCriminal ? BellType.Bad : bellType}
-              className={isRinging && !isPerfectHuman ? "bell ring" : "bell"}
+              className={isRinging && !isPerfectHuman ? ringingType : "bell"}
               alt="除夜の鐘"
             />
           </a>
@@ -274,6 +322,13 @@ function App() {
         </div>
       </div>
       <div className={isModalOpen ? "modal" : "modal-close"}>
+        <h1>迎春RTA</h1>
+        <p className="japanese">できる限り速く鐘をタップして108回鳴らそう</p>
+        <p>Ring the bell 108 times quickly to welcome the New Year</p>
+        <p>快速敲108次钟来迎新年</p>
+        <p className="japanese">鐘以外のものを叩いてはいけません</p>
+        <p>Avoid tapping anything else</p>
+        <p>不要敲锺以外的东西</p>
         <button onClick={handleStart}>始める</button>
       </div>
     </div>
