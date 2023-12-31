@@ -92,6 +92,19 @@
   font-family: inherit;
   background-color: #1a1a1a;
   transition: border-color 0.25s;
+  line-height: 1em;
+}
+
+.endroll-message {
+  border-radius: 2em;
+  border: 1px solid transparent;
+  padding: 0.3em 0 0.2em 0;
+  font-size: 4em;
+  font-weight: 1000;
+  font-family: inherit;
+  background-color: #aa0000;
+  transition: border-color 0.25s;
+  line-height: 1em;
 }
 
 .timer {
@@ -105,15 +118,33 @@
   transition: border-color 0.25s;
 }
 
-.reset-button {
+.endroll-timer {
   border-radius: 8px;
   border: 1px solid transparent;
-  margin: 0.6em 1.2em;
+  padding: 0.6em 0;
+  font-size: 3em;
+  font-weight: 1000;
+  font-family: inherit;
+  background: linear-gradient(45deg, #B67B03 0%, #DAAF08 45%, #FEE9A0 70%, #DAAF08 85%, #B67B03 90% 100%);
+  transition: border-color 0.25s;
+  color: #000;
+}
+
+.reset-button {
+  border-radius: 2em;
+  border: 1px solid transparent;
+  margin: 0.6em 0.6em;
+  padding: 0.5em 0.5em 0.2em 0.5em;
   font-size: 2em;
   font-weight: 500;
   font-family: inherit;
   background-color: #1a1a1a;
   transition: border-color 0.25s;
+}
+
+.button-box {
+  display: flex;
+  justify-content: center;
 }
 
 .read-the-docs {
