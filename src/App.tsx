@@ -8,7 +8,7 @@ type bellRefT = {
 
 enum BellType {
   Normal = "/bell2.webp",
-  Over = "/bell.webp"
+  Bad = "/badbell1.webp"
 }
 
 function App() {
@@ -37,16 +37,17 @@ function App() {
       // 一定の確率で画面が変わる
       case BellType.Normal:
         if (Math.random() < 0.1) {
-          setBellType(BellType.Over);
+          setBellType(BellType.Bad);
+          // 300 - 500ms後にBellを正常に戻す
           setTimeout(() => {
             setBellType(BellType.Normal);
-          }, effectTime);
+          }, Math.floor(Math.random() * (500 - 300 + 1)) + 300);
         }
         setRingingStatuses();
         playBellSound();
         eliminateLust();
         break;
-      case BellType.Over:
+      case BellType.Bad:
         setIsCriminal(true);
         break;
     }
