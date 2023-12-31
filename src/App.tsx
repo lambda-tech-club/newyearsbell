@@ -25,7 +25,8 @@ const isiOSDevice = (
 
 function App() {
   const effectTime = 1000; // ms
-  const threshold = 10; // よくわからん単位
+  const thousand = 1000; // よくわからん単位
+  const significantDecimalPoint = 2; // タイマーの小数点以下の有効桁数
   const lustLimit = 108; // 人間がもってる煩悩の数
   const bellSoundText = "ゴーン";
   const newYearText = "迎春";
@@ -129,11 +130,13 @@ function App() {
         timeout = setTimeout(tick, 10);
       };
 
-      tick();
+      if (lustCnt !== lustLimit) {
+        tick();
+      }
     }
 
     return () => clearTimeout(timeout);
-  }, [timerActive]);
+  }, [timerActive, lustCnt]);
 
   return (
     <div className="App">
@@ -158,7 +161,9 @@ function App() {
           <div className="card">
             <div className="counter">{`${lustCnt}回`}</div>
             <br />
-            <div className="timer">{`${(time / 1000).toFixed(2)} 秒`}</div>
+            <div className="timer">{`${(time / thousand).toFixed(
+              significantDecimalPoint
+            )} 秒`}</div>
             <button className="reset-button" onClick={handleReset}>
               Reset
             </button>
