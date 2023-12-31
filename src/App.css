@@ -92,6 +92,7 @@
   font-family: inherit;
   background-color: #1a1a1a;
   transition: border-color 0.25s;
+  line-height: 1em;
 }
 
 .timer {

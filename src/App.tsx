@@ -17,6 +17,7 @@ function App() {
   const significantDecimalPoint = 2; // タイマーの小数点以下の有効桁数
   const lustLimit = 108; // 人間がもってる煩悩の数
   const newYearText = "迎春";
+  const gameOverText1 = "顔を叩いてしまった";
 
   const [lustCnt, setLustCnt] = useState(0);
   // 煩悩のない人間を表す
@@ -31,7 +32,7 @@ function App() {
   const bellRef = useRef<bellRefT>(null!);
 
   const gong = () => {
-    if (isPerfectHuman) return;
+    if (isPerfectHuman || isCriminal) return;
 
     switch (bellType) {
       // 一定の確率で画面が変わる
@@ -49,6 +50,7 @@ function App() {
         break;
       case BellType.Bad:
         setIsCriminal(true);
+        bellRef.current.screamSound.play();
         break;
     }
   };
@@ -79,9 +81,18 @@ function App() {
     bellRef.current.kotoSound.volume = 1;
   };
 
+  // 悲鳴の初期化
+  const initScreamSound = () => {
+    bellRef.current.screamSound.volume = 0;
+    bellRef.current.screamSound.play();
+    bellRef.current.screamSound.pause();
+    bellRef.current.screamSound.currentTime = 0;
+    bellRef.current.screamSound.volume = 1;
+  };
+
   // 煩悩消す作業の状態管理
   const eliminateLust = () => {
-    if (isPerfectHuman) return;
+    if (isPerfectHuman || isCriminal) return;
 
     if (lustCnt + 1 >= lustLimit) {
       setIsPerfectHuman(true);
@@ -98,12 +109,14 @@ function App() {
     setTimerActive(true);
     gong();
     initKotoSound();
+    initScreamSound();
   };
 
   const initBellRef = () => {
     bellRef.current = {
       bellSound: new Audio("/bell.mp3"),
-      kotoSound: new Audio("/koto.mp3")
+      kotoSound: new Audio("/koto.mp3"),
+      screamSound: new Audio("/scream.mp3")
     };
   };
 
@@ -142,31 +155,42 @@ function App() {
   return (
     <div className="App">
       <div className={isModalOpen ? "bg" : ""}>
-        {isCriminal && <div className="counter">{"犯罪者です"}</div>}
+        {isCriminal && (
+          <img className="complete" src="/background_bad.webp" alt="ゲームオーバ" />
+        )}
         {isPerfectHuman && (
           <img className="complete" src="/background.webp" alt="迎春" />
         )}
         <div className="card">
           <div className="counter">
-            {isPerfectHuman ? newYearText : `${lustCnt}回`}
+            {isPerfectHuman ? newYearText : isCriminal ? gameOverText1 : `${lustCnt}回`}
           </div>
         </div>
         <div>
           <a onClick={gong}>
             <img
-              src={bellType}
+              src={isCriminal ? BellType.Bad : bellType}
               className={isRinging && !isPerfectHuman ? "bell ring" : "bell"}
               alt="除夜の鐘"
             />
           </a>
         </div>
         <div className="card">
-          <div className="timer">{`${(time / thousand).toFixed(
+          {!isCriminal && (<div className="timer">{`${(time / thousand).toFixed(
             significantDecimalPoint
-          )} 秒`}</div>
+          )} 秒`}</div>)}
+          {isPerfectHuman && (
+            <a
+              href={`https://twitter.com/intent/tweet?text=${beforeTweetText}${(
+                time / thousand
+              ).toFixed(significantDecimalPoint)}${afterTweetText}`}
+            >
+              ツイートで自慢する
+            </a>
+          )}
           <button
             className="reset-button"
-            onClick={isPerfectHuman ? handleReload : handleReset}
+            onClick={(isPerfectHuman || isCriminal) ? handleReload : handleReset}
           >
             やり直す
           </button>
