@@ -49,13 +49,13 @@ function App() {
       case BellType.Normal:
         if (lustCnt < lustLimit - 1) {
           const randomNum = Math.random();
-          console.log(randomNum);
+          const jitter = randomNum * 1000;
           if (randomNum < 0.05) {
             setBellType(BellType.Bad);
             // 一定時間後にBellを正常に戻す
             setTimeout(() => {
               setBellType(BellType.Normal);
-            }, 400);
+            }, 400 + jitter);
           }
           if (randomNum >= 0.05 && randomNum < 0.1) {
             setBellType(BellType.Door);
@@ -64,14 +64,14 @@ function App() {
             setTimeout(() => {
               setBellType(BellType.Normal);
               setRingingType("bell ring");
-            }, 1000);
+            }, 600 + jitter);
           }
           if (randomNum >= 0.1 && randomNum < 0.2) {
             setBellType(BellType.Bonus);
             // 一定時間後にBellを正常に戻す
             setTimeout(() => {
               setBellType(BellType.Normal);
-            }, 1000);
+            }, 400 + jitter);
           }
         }
         setRingingStatuses();
