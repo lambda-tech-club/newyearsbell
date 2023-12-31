@@ -4,11 +4,14 @@ import "./App.css";
 type bellRefT = {
   bellSound: HTMLAudioElement;
   kotoSound: HTMLAudioElement;
+  screamSound: HTMLAudioElement;
+  doorSound: HTMLAudioElement;
 };
 
 enum BellType {
   Normal = "/bell2.webp",
-  Bad = "/badbell1.webp"
+  Bad = "/badbell1.webp",
+  Door = "/badbell2.png"
 }
 
 function App() {
@@ -40,15 +43,30 @@ function App() {
     switch (bellType) {
       // 一定の確率で画面が変わる
       case BellType.Normal:
-        if (Math.random() < 0.1 && lustCnt < lustLimit - 1) {
-          setBellType(BellType.Bad);
-          // 300 - 500ms後にBellを正常に戻す
-          setTimeout(() => {
-            setBellType(BellType.Normal);
-          }, Math.floor(Math.random() * (500 - 300 + 1)) + 300);
+        if (lustCnt < lustLimit - 1) {
+          const randomNum = Math.random();
+          if (randomNum < 0.3) {
+            setBellType(BellType.Bad);
+            // 一定時間後にBellを正常に戻す
+            setTimeout(() => {
+              setBellType(BellType.Normal);
+            }, 300);
+          }
+          if (randomNum >= 0.3 && randomNum < 0.6) {
+            setBellType(BellType.Door);
+            // 一定時間後にBellを正常に戻す
+            setTimeout(() => {
+              setBellType(BellType.Normal);
+            }, 1000);
+          }
         }
         setRingingStatuses();
         playBellSound();
+        eliminateLust();
+        break;
+      case BellType.Door:
+        setRingingStatuses();
+        playDoorSound();
         eliminateLust();
         break;
       case BellType.Bad:
@@ -75,6 +93,13 @@ function App() {
     bellRef.current.bellSound.play();
   };
 
+  const playDoorSound = () => {
+    bellRef.current.doorSound.pause();
+    // 連打対応のための頭出し
+    bellRef.current.doorSound.currentTime = 1;
+    bellRef.current.doorSound.play();
+  };
+
   // 琴の音の初期化
   const initKotoSound = () => {
     bellRef.current.kotoSound.volume = 0;
@@ -91,6 +116,15 @@ function App() {
     bellRef.current.screamSound.pause();
     bellRef.current.screamSound.currentTime = 0;
     bellRef.current.screamSound.volume = 1;
+  };
+
+  // ドアベルの初期化
+  const initDoorSound = () => {
+    bellRef.current.doorSound.volume = 0;
+    bellRef.current.doorSound.play();
+    bellRef.current.doorSound.pause();
+    bellRef.current.doorSound.currentTime = 0;
+    bellRef.current.doorSound.volume = 1;
   };
 
   // 煩悩消す作業の状態管理
@@ -113,13 +147,15 @@ function App() {
     gong();
     initKotoSound();
     initScreamSound();
+    initDoorSound();
   };
 
   const initBellRef = () => {
     bellRef.current = {
       bellSound: new Audio("/bell.mp3"),
       kotoSound: new Audio("/koto.mp3"),
-      screamSound: new Audio("/scream.mp3")
+      screamSound: new Audio("/scream.mp3"),
+      doorSound: new Audio("/chime.mp3")
     };
   };
 
