@@ -4,6 +4,8 @@ import "./App.css";
 type bellRefT = {
   bellSound: HTMLAudioElement;
   kotoSound: HTMLAudioElement;
+  screamSound: HTMLAudioElement;
+  kongSound: HTMLAudioElement;
 };
 
 enum BellType {
@@ -110,16 +112,18 @@ function App() {
     // iOSなどのデバイスで音を出すため、ユーザーに画面を最低一度タップしてもらう必要があり、
     // 始めるボタンを最初に鐘を叩いたと見なす
     setTimerActive(true);
-    gong();
+    // gong();
     initKotoSound();
     initScreamSound();
+    bellRef.current.kongSound.play();
   };
 
   const initBellRef = () => {
     bellRef.current = {
       bellSound: new Audio("/bell.mp3"),
       kotoSound: new Audio("/koto.mp3"),
-      screamSound: new Audio("/scream.mp3")
+      screamSound: new Audio("/scream.mp3"),
+      kongSound: new Audio("/kong.mp3")
     };
   };
 
@@ -238,6 +242,9 @@ function App() {
         </div>
       </div>
       <div className={isModalOpen ? "modal" : "modal-close"}>
+        <h1>迎春RTA</h1>
+        <p>できる限り速く鐘をタップして108回鳴らそう</p>
+        <p>鐘以外のものを叩くとペナルティ</p>
         <button onClick={handleStart}>始める</button>
       </div>
     </div>
