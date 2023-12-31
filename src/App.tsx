@@ -4,23 +4,6 @@ import "./App.css";
 type bellRefT = {
   bellSound: HTMLAudioElement;
   kotoSound: HTMLAudioElement;
-  isRinging: boolean;
-  isPerfectHuman: boolean;
-  lustCnt: number;
-};
-
-type DeviceOrientationEventType = {
-  requestPermission: () => Promise<"granted" | "denied">;
-};
-
-const isiOSDevice = (
-  deviceOrientationEvent: any
-): deviceOrientationEvent is DeviceOrientationEventType => {
-  return (
-    deviceOrientationEvent !== undefined &&
-    "requestPermission" in deviceOrientationEvent &&
-    typeof deviceOrientationEvent.requestPermission === "function"
-  );
 };
 
 function App() {
@@ -28,7 +11,6 @@ function App() {
   const thousand = 1000; // よくわからん単位
   const significantDecimalPoint = 2; // タイマーの小数点以下の有効桁数
   const lustLimit = 108; // 人間がもってる煩悩の数
-  const bellSoundText = "ゴーン";
   const newYearText = "迎春";
 
   const [lustCnt, setLustCnt] = useState(0);
@@ -51,13 +33,9 @@ function App() {
 
   // 鐘の状態管理
   const setRingingStatuses = () => {
-    // EventListenerで鐘の状態を取得する必要があるため、
-    // レンダリング用のisRingingと別にUseRefでも管理する。
-    bellRef.current.isRinging = true;
     setIsRinging(true);
 
     setTimeout(() => {
-      bellRef.current.isRinging = false;
       setIsRinging(false);
     }, effectTime);
   };
@@ -81,15 +59,13 @@ function App() {
 
   // 煩悩消す作業の状態管理
   const eliminateLust = () => {
-    if (bellRef.current.isPerfectHuman || isPerfectHuman) return;
+    if (isPerfectHuman) return;
 
-    if (lustCnt + 1 >= lustLimit || bellRef.current.lustCnt + 1 >= lustLimit) {
+    if (lustCnt + 1 >= lustLimit) {
       setIsPerfectHuman(true);
       bellRef.current.kotoSound.play();
-      bellRef.current.isPerfectHuman = true;
     }
 
-    bellRef.current.lustCnt++;
     setLustCnt(lustCnt => lustCnt + 1);
   };
 
@@ -104,11 +80,8 @@ function App() {
 
   const initBellRef = () => {
     bellRef.current = {
-      isRinging: false,
       bellSound: new Audio("/bell.mp3"),
-      kotoSound: new Audio("/koto.mp3"),
-      lustCnt: 0,
-      isPerfectHuman: false
+      kotoSound: new Audio("/koto.mp3")
     };
   };
 
@@ -118,8 +91,10 @@ function App() {
     setLustCnt(0);
     setTimerActive(false);
     setTime(0);
-    bellRef.current.kotoSound.pause();
-    bellRef.current.kotoSound.currentTime = 0;
+  };
+
+  const handleReload = () => {
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -166,7 +141,10 @@ function App() {
           <div className="timer">{`${(time / thousand).toFixed(
             significantDecimalPoint
           )} 秒`}</div>
-          <button className="reset-button" onClick={handleReset}>
+          <button
+            className="reset-button"
+            onClick={isPerfectHuman ? handleReload : handleReset}
+          >
             やり直す
           </button>
         </div>
