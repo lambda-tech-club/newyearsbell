@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import "./App.css";
 
@@ -28,7 +27,7 @@ function App() {
   const effectTime = 1000; // ms
   const thousand = 1000; // よくわからん単位
   const significantDecimalPoint = 2; // タイマーの小数点以下の有効桁数
-  const lustLimit = 18; // 人間がもってる煩悩の数
+  const lustLimit = 108; // 人間がもってる煩悩の数
   const bellSoundText = "ゴーン";
   const newYearText = "迎春";
 
@@ -66,6 +65,7 @@ function App() {
   // 鐘をゴーン
   const playBellSound = () => {
     bellRef.current.bellSound.pause();
+    // 連打対応のための頭出し
     bellRef.current.bellSound.currentTime = 1;
     bellRef.current.bellSound.play();
   };
