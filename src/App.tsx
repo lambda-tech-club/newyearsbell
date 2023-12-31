@@ -55,7 +55,7 @@ function App() {
             // 一定時間後にBellを正常に戻す
             setTimeout(() => {
               setBellType(BellType.Normal);
-            }, 400 + jitter);
+            }, 300 + jitter);
           }
           if (randomNum >= 0.05 && randomNum < 0.1) {
             setBellType(BellType.Door);
@@ -71,7 +71,7 @@ function App() {
             // 一定時間後にBellを正常に戻す
             setTimeout(() => {
               setBellType(BellType.Normal);
-            }, 400 + jitter);
+            }, 800 + jitter);
           }
         }
         setRingingStatuses();
@@ -253,6 +253,22 @@ function App() {
             <div className="bonus-bg"></div>
         )}
         <div className="card">
+          {(!isPerfectHuman && !isCriminal ) && (
+            <div>
+              {bellType === BellType.Bonus && (
+                <h3>ボーナスタイム❗❗</h3>
+              )}
+              {bellType === BellType.Bad && (
+                <h3>叩かないでね🥺</h3>
+              )}
+              {bellType === BellType.Door && (
+                <h3>ピンポン禁止❌</h3>
+              )}
+              {bellType === BellType.Normal && (
+                <h3>鐘をタップして鳴らせ</h3>
+              )}
+            </div>
+          )}
           <div className={isPerfectHuman ? "endroll-message" : "counter"}>
             {isPerfectHuman
               ? newYearText
