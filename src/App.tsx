@@ -6,6 +6,11 @@ type bellRefT = {
   kotoSound: HTMLAudioElement;
 };
 
+enum BellType {
+  Normal = "/bell2.webp",
+  Over = "/bell.webp"
+}
+
 function App() {
   const effectTime = 1000; // ms
   const thousand = 1000; // よくわからん単位
@@ -20,15 +25,31 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [time, setTime] = useState(0);
   const [timerActive, setTimerActive] = useState(false);
+  const [bellType, setBellType] = useState(BellType.Normal);
+  const [isCriminal, setIsCriminal] = useState(false);
 
   const bellRef = useRef<bellRefT>(null!);
 
   const gong = () => {
     if (isPerfectHuman) return;
 
-    setRingingStatuses();
-    playBellSound();
-    eliminateLust();
+    switch (bellType) {
+      // 一定の確率で画面が変わる
+      case BellType.Normal:
+        if (Math.random() < 0.1) {
+          setBellType(BellType.Over);
+          setTimeout(() => {
+            setBellType(BellType.Normal);
+          }, effectTime);
+        }
+        setRingingStatuses();
+        playBellSound();
+        eliminateLust();
+        break;
+      case BellType.Over:
+        setIsCriminal(true);
+        break;
+    }
   };
 
   // 鐘の状態管理
@@ -120,6 +141,7 @@ function App() {
   return (
     <div className="App">
       <div className={isModalOpen ? "bg" : ""}>
+        {isCriminal && <div className="counter">{"犯罪者です"}</div>}
         {isPerfectHuman && (
           <img className="complete" src="/background.webp" alt="迎春" />
         )}
@@ -131,7 +153,7 @@ function App() {
         <div>
           <a onClick={gong}>
             <img
-              src="/bell2.webp"
+              src={bellType}
               className={isRinging && !isPerfectHuman ? "bell ring" : "bell"}
               alt="除夜の鐘"
             />
