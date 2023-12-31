@@ -35,7 +35,6 @@ function App() {
   const [isPerfectHuman, setIsPerfectHuman] = useState(false);
   const [isRinging, setIsRinging] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
-  const [hasPermission, setPermission] = useState(false);
 
   const bellRef = useRef<bellRefT>(null!);
 
@@ -98,34 +97,6 @@ function App() {
     initKotoSound();
   };
 
-  // 加速度が一定を超えたら
-  const handleDevicemotion = (e: DeviceMotionEvent) => {
-    if (
-      (e.acceleration?.x ?? 0) > threshold ||
-      (e.acceleration?.y ?? 0) > threshold ||
-      (e.acceleration?.z ?? 0) > threshold
-    )
-      gong();
-  };
-
-  // 加速度センサーの使用許可を取得
-  const handleSensorPermissionRequest = () => {
-    if (!isiOSDevice(DeviceOrientationEvent)) {
-      return;
-    }
-
-    DeviceOrientationEvent.requestPermission()
-      .then(function(response) {
-        if (response === "granted") {
-          setPermission(true);
-          window.addEventListener("devicemotion", handleDevicemotion);
-        }
-      })
-      .catch((e: Error) => {
-        console.log(e);
-      });
-  };
-
   const initBellRef = () => {
     bellRef.current = {
       isRinging: false,
@@ -139,14 +110,6 @@ function App() {
   useEffect(() => {
     // 初期化のとき一度だけrefの値を設定する。
     initBellRef();
-
-    if (isiOSDevice(window.DeviceOrientationEvent)) {
-      return;
-    }
-
-    // DeviceOrientationEventが存在しない = iOS以外のデバイスの場合は、許可を取ったと見なす
-    setPermission(true);
-    window.addEventListener("devicemotion", handleDevicemotion);
   }, []);
 
   return (
@@ -171,17 +134,9 @@ function App() {
         <div className="card">
           <div className="counter">{`${lustCnt}回`}</div>
         </div>
-        <p className="read-the-docs">端末を振ると鐘が鳴ります</p>
       </div>
       <div className={isModalOpen ? "modal" : "modal-close"}>
-        <p className="modal-text">端末を振って鐘を鳴らそう</p>
-        {!hasPermission ? (
-          <button onClick={handleSensorPermissionRequest}>
-            センサーを起動
-          </button>
-        ) : (
-          <button onClick={handleStart}>始める</button>
-        )}
+        <button onClick={handleStart}>始める</button>
       </div>
     </div>
   );
