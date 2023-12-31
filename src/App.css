@@ -26,6 +26,7 @@
 }
 
 .complete {
+  z-index: -255;
   position: fixed;
   top: 0;
   left: 0;
