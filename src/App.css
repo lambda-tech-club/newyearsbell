@@ -26,6 +26,7 @@
 }
 
 .complete {
+  z-index: -255;
   position: fixed;
   top: 0;
   left: 0;
@@ -39,6 +40,19 @@
 }
 .ring {
   filter: drop-shadow(0 0 6em #ffde3daa);
+}
+.door-ring {
+  filter: drop-shadow(0 0 6em #3ddeffaa);
+}
+
+.bonus-bg {
+  z-index: -255;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
 }
 
 @keyframes logo-spin {
@@ -81,6 +95,14 @@
   padding: 10px 30px;
   background-color: #fff;
 }
+.modal >p {
+  text-align: left;
+  padding-left: 1rem;
+}
+.japanese {
+  font-weight: bold;
+  font-size: 120%;
+}
 
 .counter {
   border-radius: 8px;
@@ -91,6 +113,59 @@
   font-family: inherit;
   background-color: #1a1a1a;
   transition: border-color 0.25s;
+  line-height: 1em;
+}
+
+.endroll-message {
+  border-radius: 2em;
+  border: 1px solid transparent;
+  padding: 0.3em 0 0.2em 0;
+  font-size: 4em;
+  font-weight: 1000;
+  font-family: inherit;
+  background-color: #aa0000;
+  transition: border-color 0.25s;
+  line-height: 1em;
+}
+
+.timer {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 2em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  transition: border-color 0.25s;
+}
+
+.endroll-timer {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 0;
+  font-size: 3em;
+  font-weight: 1000;
+  font-family: inherit;
+  background: linear-gradient(45deg, #B67B03 0%, #DAAF08 45%, #FEE9A0 70%, #DAAF08 85%, #B67B03 90% 100%);
+  transition: border-color 0.25s;
+  color: #000;
+}
+
+.reset-button {
+  border-radius: 2em;
+  border: 1px solid transparent;
+  margin: 0.6em 0.6em;
+  padding: 0.5em 0.5em 0.2em 0.5em;
+  font-size: 2em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  transition: border-color 0.25s;
+}
+
+.button-box {
+  display: flex;
+  justify-content: center;
 }
 
 .read-the-docs {
