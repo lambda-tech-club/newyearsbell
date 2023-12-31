@@ -38,6 +38,7 @@ function App() {
   const [bellType, setBellType] = useState(BellType.Normal);
   const [isCriminal, setIsCriminal] = useState(false);
   const [ringingType, setRingingType] = useState("bell ring");
+  const [startTime, setStartTime] = useState(0);
 
   const bellRef = useRef<bellRefT>(null!);
 
@@ -166,7 +167,10 @@ function App() {
 
     if (lustCnt + cnt >= lustLimit) {
       setIsPerfectHuman(true);
+      setTime(new Date().getTime() - startTime);
+      setTimerActive(false);
       bellRef.current.kotoSound.play();
+      return;
     }
 
     setLustCnt(lustCnt => lustCnt + cnt);
@@ -189,7 +193,8 @@ function App() {
     initKotoSound();
     initScreamSound();
     initDoorSound();
-    initBonusSound;
+    initBonusSound();
+    setStartTime(new Date().getTime());
     bellRef.current.kongSound.play();
   };
 
@@ -224,17 +229,15 @@ function App() {
 
     if (timerActive) {
       const tick = () => {
-        setTime(prevTime => prevTime + 10);
-        timeout = setTimeout(tick, 10);
+        setTime(prevTime => prevTime + 37);
+        timeout = setTimeout(tick, 37);
       };
 
-      if (lustCnt !== lustLimit) {
-        tick();
-      }
+      tick();
     }
 
     return () => clearTimeout(timeout);
-  }, [timerActive, lustCnt]);
+  }, [timerActive]);
 
   return (
     <div className="App">
