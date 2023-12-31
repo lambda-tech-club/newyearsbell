@@ -15,12 +15,12 @@ function App() {
   const effectTime = 1000; // ms
   const thousand = 1000; // よくわからん単位
   const significantDecimalPoint = 2; // タイマーの小数点以下の有効桁数
-  const lustLimit = 3; // 人間がもってる煩悩の数
+  const lustLimit = 108; // 人間がもってる煩悩の数
   const newYearText = "迎春";
   const gameOverText1 = "顔を叩いてしまった";
-  const beforeTweetText = encodeURIComponent("結果は「");
+  const beforeTweetText = encodeURIComponent("【");
   const afterTweetText = encodeURIComponent(
-    "」秒でした！\r\nhttps://newyearsbell.vercel.app"
+    "秒】で煩悩を打ち消しました🔔\r\n\r\n迎春RTA〜誰よりも早く煩悩を打ち消せ！\r\nhttps://newyearsbell.vercel.app\r\n\r\n#迎春RTA #ラムダ技術部"
   );
   const [lustCnt, setLustCnt] = useState(0);
   // 煩悩のない人間を表す
@@ -40,7 +40,7 @@ function App() {
     switch (bellType) {
       // 一定の確率で画面が変わる
       case BellType.Normal:
-        if (Math.random() < 0.1) {
+        if (Math.random() < 0.1 && lustCnt < lustLimit - 1) {
           setBellType(BellType.Bad);
           // 300 - 500ms後にBellを正常に戻す
           setTimeout(() => {
@@ -169,7 +169,7 @@ function App() {
           <img className="complete" src="/background.webp" alt="迎春" />
         )}
         <div className="card">
-          <div className="counter">
+          <div className={isPerfectHuman ? "endroll-message" : "counter"}>
             {isPerfectHuman
               ? newYearText
               : isCriminal
@@ -188,25 +188,53 @@ function App() {
         </div>
         <div className="card">
           {!isCriminal && (
-            <div className="timer">{`${(time / thousand).toFixed(
-              significantDecimalPoint
-            )} 秒`}</div>
+            <div className={isPerfectHuman ? "endroll-timer" : "timer"}>{`${(
+              time / thousand
+            ).toFixed(significantDecimalPoint)} 秒`}</div>
           )}
-          {isPerfectHuman && (
-            <a
-              href={`https://twitter.com/intent/tweet?text=${beforeTweetText}${(
-                time / thousand
-              ).toFixed(significantDecimalPoint)}${afterTweetText}`}
+          <div className="button-box">
+            {isPerfectHuman && (
+              <button className="reset-button">
+                <a
+                  href={`https://twitter.com/intent/tweet?text=${beforeTweetText}${(
+                    time / thousand
+                  ).toFixed(significantDecimalPoint)}${afterTweetText}`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="48"
+                    width="48"
+                    viewBox="0 0 512 512"
+                  >
+                    {/* Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc." */}
+                    <path
+                      fill="#fff"
+                      d="M459.4 151.7c.3 4.5 .3 9.1 .3 13.6 0 138.7-105.6 298.6-298.6 298.6-59.5 0-114.7-17.2-161.1-47.1 8.4 1 16.6 1.3 25.3 1.3 49.1 0 94.2-16.6 130.3-44.8-46.1-1-84.8-31.2-98.1-72.8 6.5 1 13 1.6 19.8 1.6 9.4 0 18.8-1.3 27.6-3.6-48.1-9.7-84.1-52-84.1-103v-1.3c14 7.8 30.2 12.7 47.4 13.3-28.3-18.8-46.8-51-46.8-87.4 0-19.5 5.2-37.4 14.3-53 51.7 63.7 129.3 105.3 216.4 109.8-1.6-7.8-2.6-15.9-2.6-24 0-57.8 46.8-104.9 104.9-104.9 30.2 0 57.5 12.7 76.7 33.1 23.7-4.5 46.5-13.3 66.6-25.3-7.8 24.4-24.4 44.8-46.1 57.8 21.1-2.3 41.6-8.1 60.4-16.2-14.3 20.8-32.2 39.3-52.6 54.3z"
+                    />
+                  </svg>
+                </a>
+              </button>
+            )}
+            <button
+              className="reset-button"
+              onClick={
+                isPerfectHuman || isCriminal ? handleReload : handleReset
+              }
             >
-              ツイートで自慢する
-            </a>
-          )}
-          <button
-            className="reset-button"
-            onClick={isPerfectHuman || isCriminal ? handleReload : handleReset}
-          >
-            やり直す
-          </button>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                height="48"
+                width="48"
+                viewBox="0 0 512 512"
+              >
+                {/* Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2023 Fonticons, Inc. */}
+                <path
+                  fill="#fff"
+                  d="M463.5 224H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5z"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
       <div className={isModalOpen ? "modal" : "modal-close"}>
