@@ -42,7 +42,7 @@ function App() {
   const bellRef = useRef<bellRefT>(null!);
 
   const gong = () => {
-    if (bellRef.current.isRinging) return;
+    if (isPerfectHuman) return;
 
     setRingingStatuses();
     playBellSound();
@@ -65,7 +65,8 @@ function App() {
   // 鐘をゴーン
   const playBellSound = () => {
     bellRef.current.bellSound.pause();
-    bellRef.current.bellSound.currentTime = 0;
+    // 連打対応のための頭出し
+    bellRef.current.bellSound.currentTime = 1;
     bellRef.current.bellSound.play();
   };
 
@@ -112,10 +113,13 @@ function App() {
   };
 
   const handleReset = () => {
+    setIsPerfectHuman(false);
     setIsModalOpen(true);
     setLustCnt(0);
     setTimerActive(false);
     setTime(0);
+    bellRef.current.kotoSound.pause();
+    bellRef.current.kotoSound.currentTime = 0;
   };
 
   useEffect(() => {
@@ -140,35 +144,32 @@ function App() {
 
   return (
     <div className="App">
-      <div className="center">
-        {isRinging ? bellSoundText : isPerfectHuman ? newYearText : ""}
-      </div>
       <div className={isModalOpen ? "bg" : ""}>
         {isPerfectHuman && (
           <img className="complete" src="/background.webp" alt="迎春" />
         )}
+        <div className="card">
+          <div className="counter">
+            {isPerfectHuman ? newYearText : `${lustCnt}回`}
+          </div>
+        </div>
         <div>
           <a onClick={gong}>
             <img
-              src="/bell.webp"
+              src="/bell2.webp"
               className={isRinging && !isPerfectHuman ? "bell ring" : "bell"}
               alt="除夜の鐘"
             />
           </a>
         </div>
-
-        {!isModalOpen && (
-          <div className="card">
-            <div className="counter">{`${lustCnt}回`}</div>
-            <br />
-            <div className="timer">{`${(time / thousand).toFixed(
-              significantDecimalPoint
-            )} 秒`}</div>
-            <button className="reset-button" onClick={handleReset}>
-              Reset
-            </button>
-          </div>
-        )}
+        <div className="card">
+          <div className="timer">{`${(time / thousand).toFixed(
+            significantDecimalPoint
+          )} 秒`}</div>
+          <button className="reset-button" onClick={handleReset}>
+            やり直す
+          </button>
+        </div>
       </div>
       <div className={isModalOpen ? "modal" : "modal-close"}>
         <button onClick={handleStart}>始める</button>
