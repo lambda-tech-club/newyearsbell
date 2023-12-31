@@ -14,7 +14,7 @@ enum BellType {
   Normal = "/bell2.webp",
   Bad = "/badbell1.webp",
   Door = "/badbell2.webp",
-  Bonus = "/bonusbell1.webp"
+  Bonus = "/goodbell1.webp"
 }
 
 function App() {
@@ -49,12 +49,13 @@ function App() {
       case BellType.Normal:
         if (lustCnt < lustLimit - 1) {
           const randomNum = Math.random();
+          console.log(randomNum);
           if (randomNum < 0.05) {
             setBellType(BellType.Bad);
             // 一定時間後にBellを正常に戻す
             setTimeout(() => {
               setBellType(BellType.Normal);
-            }, 300);
+            }, 400);
           }
           if (randomNum >= 0.05 && randomNum < 0.1) {
             setBellType(BellType.Door);
@@ -120,8 +121,7 @@ function App() {
 
   const playBonusSound = () => {
     bellRef.current.bonusSound.pause();
-    // 連打対応のための頭出し
-    bellRef.current.bonusSound.currentTime = 1;
+    bellRef.current.bonusSound.currentTime = 0;
     bellRef.current.bonusSound.play();
   };
 
@@ -200,7 +200,7 @@ function App() {
       screamSound: new Audio("/scream.mp3"),
       doorSound: new Audio("/chime.mp3"),
       kongSound: new Audio("/kong.mp3"),
-      bonusSound: new Audio("/bonus.mp3")
+      bonusSound: new Audio("/goodbell.mp3")
     };
   };
 
