@@ -35,6 +35,8 @@ function App() {
   const [isPerfectHuman, setIsPerfectHuman] = useState(false);
   const [isRinging, setIsRinging] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(true);
+  const [time, setTime] = useState(0);
+  const [timerActive, setTimerActive] = useState(false);
 
   const bellRef = useRef<bellRefT>(null!);
 
@@ -86,13 +88,14 @@ function App() {
     }
 
     bellRef.current.lustCnt++;
-    setLustCnt((lustCnt) => lustCnt + 1);
+    setLustCnt(lustCnt => lustCnt + 1);
   };
 
   const handleStart = () => {
     setIsModalOpen(false);
     // iOSなどのデバイスで音を出すため、ユーザーに画面を最低一度タップしてもらう必要があり、
     // 始めるボタンを最初に鐘を叩いたと見なす
+    setTimerActive(true);
     gong();
     initKotoSound();
   };
@@ -103,14 +106,34 @@ function App() {
       bellSound: new Audio("/bell.mp3"),
       kotoSound: new Audio("/koto.mp3"),
       lustCnt: 0,
-      isPerfectHuman: false,
+      isPerfectHuman: false
     };
+  };
+
+  const handleReset = () => {
+    setIsModalOpen(true);
+    setLustCnt(0);
+    setTimerActive(false);
+    setTime(0);
   };
 
   useEffect(() => {
     // 初期化のとき一度だけrefの値を設定する。
     initBellRef();
-  }, []);
+
+    let timeout: number;
+
+    if (timerActive) {
+      const tick = () => {
+        setTime(prevTime => prevTime + 10);
+        timeout = setTimeout(tick, 10);
+      };
+
+      tick();
+    }
+
+    return () => clearTimeout(timeout);
+  }, [timerActive]);
 
   return (
     <div className="App">
@@ -131,9 +154,16 @@ function App() {
           </a>
         </div>
 
-        <div className="card">
-          <div className="counter">{`${lustCnt}回`}</div>
-        </div>
+        {!isModalOpen && (
+          <div className="card">
+            <div className="counter">{`${lustCnt}回`}</div>
+            <br />
+            <div className="timer">{`${(time / 1000).toFixed(2)} 秒`}</div>
+            <button className="reset-button" onClick={handleReset}>
+              Reset
+            </button>
+          </div>
+        )}
       </div>
       <div className={isModalOpen ? "modal" : "modal-close"}>
         <button onClick={handleStart}>始める</button>
