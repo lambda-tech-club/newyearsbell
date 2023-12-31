@@ -15,10 +15,13 @@ function App() {
   const effectTime = 1000; // ms
   const thousand = 1000; // よくわからん単位
   const significantDecimalPoint = 2; // タイマーの小数点以下の有効桁数
-  const lustLimit = 108; // 人間がもってる煩悩の数
+  const lustLimit = 3; // 人間がもってる煩悩の数
   const newYearText = "迎春";
   const gameOverText1 = "顔を叩いてしまった";
-
+  const beforeTweetText = encodeURIComponent("結果は「");
+  const afterTweetText = encodeURIComponent(
+    "」秒でした！\r\nhttps://newyearsbell.vercel.app"
+  );
   const [lustCnt, setLustCnt] = useState(0);
   // 煩悩のない人間を表す
   const [isPerfectHuman, setIsPerfectHuman] = useState(false);
@@ -156,14 +159,22 @@ function App() {
     <div className="App">
       <div className={isModalOpen ? "bg" : ""}>
         {isCriminal && (
-          <img className="complete" src="/background_bad.webp" alt="ゲームオーバ" />
+          <img
+            className="complete"
+            src="/background_bad.webp"
+            alt="ゲームオーバ"
+          />
         )}
         {isPerfectHuman && (
           <img className="complete" src="/background.webp" alt="迎春" />
         )}
         <div className="card">
           <div className="counter">
-            {isPerfectHuman ? newYearText : isCriminal ? gameOverText1 : `${lustCnt}回`}
+            {isPerfectHuman
+              ? newYearText
+              : isCriminal
+              ? gameOverText1
+              : `${lustCnt}回`}
           </div>
         </div>
         <div>
@@ -176,9 +187,11 @@ function App() {
           </a>
         </div>
         <div className="card">
-          {!isCriminal && (<div className="timer">{`${(time / thousand).toFixed(
-            significantDecimalPoint
-          )} 秒`}</div>)}
+          {!isCriminal && (
+            <div className="timer">{`${(time / thousand).toFixed(
+              significantDecimalPoint
+            )} 秒`}</div>
+          )}
           {isPerfectHuman && (
             <a
               href={`https://twitter.com/intent/tweet?text=${beforeTweetText}${(
@@ -190,7 +203,7 @@ function App() {
           )}
           <button
             className="reset-button"
-            onClick={(isPerfectHuman || isCriminal) ? handleReload : handleReset}
+            onClick={isPerfectHuman || isCriminal ? handleReload : handleReset}
           >
             やり直す
           </button>
